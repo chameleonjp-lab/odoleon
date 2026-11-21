@@ -1,5 +1,4 @@
 import { analyzeAudioAndBuildChart, SONGS } from "./songs.js";
-import { COMBO_EFFECTS_80 } from "./combo-effects.js";
 
 (() => {
   // =========================================================
@@ -54,20 +53,11 @@ import { COMBO_EFFECTS_80 } from "./combo-effects.js";
   const scoreValEl = document.getElementById('score-value');
   const comboBadgeEl = document.getElementById('combo-badge');
   const progressFillEl = document.getElementById('progress-fill');
-  const stageTierPillEl = document.getElementById('stage-tier-pill');
   const calloutBannerEl = document.getElementById('callout-banner');
-  const unlockToastEl = document.getElementById('unlock-toast');
   const scoreBoxEl = document.getElementById('score-box');
   const controlsBarEl = document.getElementById('controls-bar');
-  const effectsBtn = document.getElementById('effects-btn');
-  const effectsModalEl = document.getElementById('effects-modal');
-  const closeEffectsBtn = document.getElementById('close-effects-btn');
-  const efListEl = document.getElementById('ef-list');
-  const efModalTitleEl = document.getElementById('ef-modal-title');
   const homeSongTitleEl = document.getElementById('home-song-title');
   const homeSongSubEl = document.getElementById('home-song-sub');
-  const homeDurValEl = document.getElementById('home-dur-val');
-  const homeNotesValEl = document.getElementById('home-notes-val');
   const openSongSelectBtn = document.getElementById('open-song-select-btn');
   const songModalEl = document.getElementById('song-modal');
   const closeSongBtn = document.getElementById('close-song-btn');
@@ -93,14 +83,7 @@ import { COMBO_EFFECTS_80 } from "./combo-effects.js";
     rebuildStepMap();
 
     homeSongTitleEl.textContent = song.title;
-    const audioTag = song.mode === 'embedded_audio'
-      ? '🎵 内蔵音源（拍・裏拍完全同期）'
-      : (song.mode === 'audio' ? `🎵 音源読込済 (${song.fileLoadedName})` : '🎹 オリジナルシンセ');
-    homeSongSubEl.textContent = `全${song.chart.length}ノーツ • ${fmtTime(song.duration)} • ${audioTag}`;
-    const m = Math.floor(song.duration / 60);
-    const sc = Math.floor(song.duration % 60);
-    homeDurValEl.textContent = `${m}分${String(sc).padStart(2, '0')}秒`;
-    homeNotesValEl.textContent = `全 ${song.chart.length} 回`;
+    homeSongSubEl.textContent = `全${song.chart.length}ノーツ ・ ${fmtTime(song.duration)}`;
     updateHUD();
   }
 
@@ -120,18 +103,7 @@ import { COMBO_EFFECTS_80 } from "./combo-effects.js";
       badge.textContent = `${song.chart.length}ノーツ / ${fmtTime(song.duration)}`;
       top.append(title, badge);
 
-      const desc = document.createElement('div');
-      desc.className = 'song-card-desc';
-      desc.textContent = `${song.subtitle}（BPM ${song.bpm}）`;
-
-      card.append(top, desc);
-
-      if (song.id === 'orekameleon') {
-        const st = document.createElement('div');
-        st.className = 'song-status-msg';
-        st.textContent = `✅ 音源内蔵済（BPM ${song.bpm.toFixed(2)} / 表拍・裏拍240ノーツ完全同期）`;
-        card.appendChild(st);
-      }
+      card.appendChild(top);
 
       card.addEventListener('click', () => {
         applySelectedSong(song.id);
@@ -139,25 +111,6 @@ import { COMBO_EFFECTS_80 } from "./combo-effects.js";
       });
       songListEl.appendChild(card);
     });
-  }
-
-  let unlockToastTimer = null;
-  function showUnlockToast(comboNum) {
-    if (comboNum < 1 || comboNum > 80) return;
-    unlockToastEl.textContent = `✨ 演出#${comboNum}/80: ${COMBO_EFFECTS_80[comboNum - 1]}`;
-    unlockToastEl.classList.add('show');
-    if (unlockToastTimer) clearTimeout(unlockToastTimer);
-    unlockToastTimer = setTimeout(() => unlockToastEl.classList.remove('show'), 1450);
-  }
-
-  function renderEffectsModal() {
-    const unlockedMax = Math.min(80, state.maxCombo);
-    efModalTitleEl.textContent = `✨ コンボ連動 80演出リスト (${unlockedMax} / 80 解放)`;
-    efListEl.innerHTML = COMBO_EFFECTS_80.map((name, i) => {
-      const num = i + 1;
-      const ok = num <= unlockedMax;
-      return `<div class="ef-row ${ok ? 'unlocked' : ''}"><span class="ef-num">${ok ? '✅' : '🔒'} #${num}</span><span class="ef-name">${name}</span></div>`;
-    }).join('');
   }
 
   const titleOverlayEl = document.getElementById('title-overlay');
@@ -2439,7 +2392,7 @@ import { COMBO_EFFECTS_80 } from "./combo-effects.js";
     if (newTier > state.stageTier) {
       playStageUpSFX();
       if (newTier === 1) {
-        showCallout('3Dバックダンサー増殖スタート！');
+        showCallout('仲間がダンスに加わった！');
         spawnFireworks(2);
       } else if (newTier === 2) {
         showCallout('ミラーボール降臨！大編成ライブ！');
@@ -2450,7 +2403,7 @@ import { COMBO_EFFECTS_80 } from "./combo-effects.js";
       }
     } else if (state.combo === 55) {
       playStageUpSFX();
-      showCallout('👑 後列55匹コンプリート！！');
+      showCallout('👑 バックダンサー勢ぞろい！');
       spawnFireworks(6);
     } else if (state.combo === 56) {
       playStageUpSFX();
@@ -2462,7 +2415,7 @@ import { COMBO_EFFECTS_80 } from "./combo-effects.js";
       spawnFireworks(7);
     } else if (state.combo === 60) {
       playStageUpSFX();
-      showCallout('🏆 ブレイクダンス全5匹コンプリート！！');
+      showCallout('🏆 ブレイクダンス隊が勢ぞろい！');
       spawnFireworks(7);
     } else if (state.combo === 70) {
       playStageUpSFX();
@@ -2471,7 +2424,7 @@ import { COMBO_EFFECTS_80 } from "./combo-effects.js";
       spawnFireworks(8);
     } else if (state.combo === 80) {
       playStageUpSFX();
-      showCallout('👑 80演出フルコンプリート!! 伝説モード突入!!');
+      showCallout('👑 80コンボ！伝説のステージへ！');
       screenFlash = { alpha: 0.65, color: '#fde047' };
       spawnFireworks(12);
     } else if (state.combo > 80 && state.combo % 20 === 0) {
@@ -2481,11 +2434,6 @@ import { COMBO_EFFECTS_80 } from "./combo-effects.js";
       spawnFireworks(10);
     }
     state.stageTier = newTier;
-
-    // Live toast showing each of the 80 effects unlocking 1-by-1!
-    if (state.combo >= 1 && state.combo <= 80) {
-      showUnlockToast(state.combo);
-    }
 
     // #8 Edge Glow, #53 Golden Crown Scoreboard, #54 Flame Combo, #78 Final Countdown Aura
     shellEl.classList.toggle('edge-glow', state.combo >= 8 && state.combo < 78);
@@ -2503,23 +2451,6 @@ import { COMBO_EFFECTS_80 } from "./combo-effects.js";
     const activeBabies = state.mode === 'playing' ? Math.min(babyChameleons.length, state.combo >= 1 ? Math.floor((state.combo + 1) / 2) : 0) : 2;
     for (let i = 0; i < babyChameleons.length; i++) {
       babyChameleons[i].visibleTarget = i < activeBabies ? 1 : 0;
-    }
-
-    stageTierPillEl.className = '';
-    if (activeBreakers > 0) {
-      stageTierPillEl.classList.add('tier-3');
-      stageTierPillEl.textContent = `🔥 BREAK FEVER — 後列55匹 ＋ ブレイク隊 ${activeBreakers}/5匹`;
-    } else if (newTier === 0) {
-      stageTierPillEl.textContent = `STAGE LV.1 — バックダンサー ${activeNPCs} / 55匹`;
-    } else if (newTier === 1) {
-      stageTierPillEl.classList.add('tier-1');
-      stageTierPillEl.textContent = `STAGE LV.2 — バックダンサー ${activeNPCs} / 55匹`;
-    } else if (newTier === 2) {
-      stageTierPillEl.classList.add('tier-2');
-      stageTierPillEl.textContent = `STAGE LV.3 — ミラーボール＆ ${activeNPCs} / 55匹`;
-    } else {
-      stageTierPillEl.classList.add('tier-3');
-      stageTierPillEl.textContent = `★ FEVER MAX — カメレオン軍団 ${activeNPCs} / 55匹 ★`;
     }
   }
 
@@ -2549,11 +2480,11 @@ import { COMBO_EFFECTS_80 } from "./combo-effects.js";
     if (song.mode === 'embedded_audio' && !song.audioBuffer) {
       isStartingGame = true;
       const prevLabel = startBtn.textContent;
-      startBtn.textContent = '🎵 音源をデコード中...';
+      startBtn.textContent = '曲を準備中…';
       try {
         await ensureSongAudioReady(song);
       } catch (e) {
-        showCallout('音源の初期化に失敗しました');
+        showCallout('曲を読み込めませんでした');
       }
       startBtn.textContent = prevLabel;
       isStartingGame = false;
@@ -3564,14 +3495,6 @@ import { COMBO_EFFECTS_80 } from "./combo-effects.js";
     muteText.textContent = audio.muted ? '音OFF' : '音ON';
   });
 
-  effectsBtn.addEventListener('click', () => {
-    renderEffectsModal();
-    effectsModalEl.classList.remove('hidden');
-  });
-  closeEffectsBtn.addEventListener('click', () => {
-    effectsModalEl.classList.add('hidden');
-  });
-
   openSongSelectBtn.addEventListener('click', () => {
     renderSongModal();
     songModalEl.classList.remove('hidden');
@@ -3598,7 +3521,6 @@ import { COMBO_EFFECTS_80 } from "./combo-effects.js";
         if (target) {
           target.mode = 'audio';
           target.audioBuffer = decoded;
-          target.fileLoadedName = file.name;
           target.bpm = analyzed.bpm;
           target.duration = analyzed.duration;
           target.chart = analyzed.chart;
@@ -3610,13 +3532,11 @@ import { COMBO_EFFECTS_80 } from "./combo-effects.js";
         SONGS.push({
           id: newId,
           title: cleanTitle,
-          subtitle: 'カスタム追加曲 • 全240ノーツ',
           bpm: analyzed.bpm,
           duration: analyzed.duration,
           noteCount: 240,
           mode: 'audio',
           audioBuffer: decoded,
-          fileLoadedName: file.name,
           chart: analyzed.chart
         });
         applySelectedSong(newId);

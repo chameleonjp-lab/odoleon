@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>カメレオン・ダンス・リズム | Chameleon Dance Rhythm 3D</title>
-  <meta name="description" content="フル3Dのぐるぐる目カメレオンが音楽に合わせて最大66匹で踊るリズムゲーム！『オレカメレオン』全240ノーツ収録。" />
+  <meta name="description" content="フル3Dのぐるぐる目カメレオンが音楽に合わせて踊るリズムゲーム！『オレカメレオン』で遊ぼう。" />
   <meta property="og:title" content="カメレオン・ダンス・リズム 3D" />
-  <meta property="og:description" content="6種類のダンスボタン＆80コンボ連動演出！『オレカメレオン』全240ノーツをiPhone・PCでプレイしよう。" />
+  <meta property="og:description" content="ノーツに合わせてタップし、カメレオンたちと踊ろう！『オレカメレオン』全240ノーツをiPhone・PCでプレイしよう。" />
   <meta property="og:type" content="website" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23181036'/><circle cx='32' cy='32' r='22' fill='%235d9d38'/><circle cx='24' cy='26' r='6' fill='%23fde047'/><circle cx='40' cy='26' r='6' fill='%23fde047'/><circle cx='24' cy='26' r='2.5' fill='%230b071c'/><circle cx='40' cy='26' r='2.5' fill='%230b071c'/></svg>" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <link rel="stylesheet" href="./styles/game.css" />
+  <link rel="stylesheet" href="./styles/game.css?v=2" />
 </head>
 <body>
   <div id="app">
@@ -44,9 +44,6 @@
           <button class="icon-btn" id="restart-btn" type="button" aria-label="やり直す">
             ↻ リトライ
           </button>
-          <button class="icon-btn" id="effects-btn" type="button" aria-label="80演出リスト">
-            ✨ 80演出
-          </button>
         </div>
       </div>
 
@@ -56,19 +53,7 @@
         </div>
       </div>
 
-      <div id="stage-tier-pill">STAGE LV.1 — ネオン・デビュー</div>
-
       <div id="callout-banner">いくよっ！</div>
-      <div id="unlock-toast">✨ 演出解放 #1</div>
-
-      <!-- 80 Combo Effects List Modal -->
-      <div id="effects-modal" class="hidden" role="dialog" aria-label="コンボ連動80演出リスト">
-        <div class="ef-head">
-          <h2 id="ef-modal-title">✨ コンボ連動 80演出リスト (0 / 80 解放)</h2>
-          <button class="icon-btn" id="close-effects-btn" type="button">✕ 閉じる</button>
-        </div>
-        <div id="ef-list"></div>
-      </div>
 
       <!-- 6 Dance Buttons -->
       <div id="controls-bar" role="group" aria-label="ダンスボタン">
@@ -124,36 +109,18 @@
       <!-- Title Overlay -->
       <div class="overlay" id="title-overlay">
         <div class="card">
-          <div class="title-tag">FULL 3D ARCADE RHYTHM</div>
           <h1>カメレオン・ダンス・リズム</h1>
 
           <!-- Selected Song Bar + Song Selection Button -->
           <div class="selected-song-bar">
             <div class="song-meta">
-              <div class="song-meta-label">SELECTED TRACK</div>
               <div class="song-meta-title" id="home-song-title">オレカメレオン</div>
-              <div class="song-meta-sub" id="home-song-sub">全240ノーツ • 2:25 • 🎵 内蔵音源（164.4 BPM完全同期）</div>
+              <div class="song-meta-sub" id="home-song-sub">全240ノーツ ・ 2:25</div>
             </div>
             <button class="song-select-trigger" id="open-song-select-btn" type="button">🎵 楽曲選択</button>
           </div>
 
-          <div class="rule-grid">
-            <div class="rule-item">
-              <div class="rk">プレイ時間</div>
-              <div class="rv" id="home-dur-val">2分25秒</div>
-            </div>
-            <div class="rule-item">
-              <div class="rk">ノーツ数</div>
-              <div class="rv" id="home-notes-val">全 240 回</div>
-            </div>
-            <div class="rule-item">
-              <div class="rk">ダンス技</div>
-              <div class="rv">6 種類</div>
-            </div>
-          </div>
-          <div class="tip-box">
-            序盤から手前に<strong>子供カメレオン（最大5匹）</strong>が登場！後列55匹＋手前ブレイク隊5匹＋全80演出がすべてボタンと連動して踊るよ。
-          </div>
+          <p class="tip-box">流れてくるノーツが光る輪に重なったら、同じ色のボタンを押そう。</p>
           <button class="primary-btn" id="start-btn" type="button">ダンスをスタート！</button>
           <div class="hi-score-line" id="title-hiscore">ハイスコア: 0</div>
         </div>
@@ -161,19 +128,19 @@
 
       <!-- Song Selection Modal -->
       <div id="song-modal" class="hidden" role="dialog" aria-label="楽曲選択">
-        <div class="ef-head">
-          <h2>🎵 楽曲選択（曲の追加もOK）</h2>
+        <div class="song-modal-header">
+          <h2>楽曲選択</h2>
           <button class="icon-btn" id="close-song-btn" type="button">✕ 閉じる</button>
         </div>
         <div id="song-list"></div>
         <input type="file" id="song-file-input" accept="audio/*,.wav,.mp3,.m4a,.ogg" style="display:none;" />
         <div style="margin-top:10px; padding:8px 10px; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:11px;">
-          <span style="font-weight:800; color:#cbd5e1; white-space:nowrap;">判定ズレ微調整</span>
+          <label for="offset-slider" style="font-weight:800; color:#cbd5e1; white-space:nowrap;">タイミング調整</label>
           <input type="range" id="offset-slider" min="-120" max="120" step="10" value="0" style="flex:1; accent-color:#22d3ee;" />
           <span id="offset-val" style="min-width:48px; text-align:right; font-weight:900; color:#fde047;">0ms</span>
         </div>
         <div style="margin-top:8px; display:flex; gap:8px;">
-          <button class="primary-btn" id="add-custom-song-btn" type="button" style="padding:10px 14px; font-size:13px;">＋ 端末の楽曲ファイルを追加（240ノーツ自動生成）</button>
+          <button class="primary-btn" id="add-custom-song-btn" type="button" style="padding:10px 14px; font-size:13px;">＋ 端末から曲を追加</button>
         </div>
       </div>
 
@@ -218,6 +185,6 @@
     </div>
   </div>
 
-  <script type="module" src="./scripts/game.js"></script>
+  <script type="module" src="./scripts/game.js?v=2"></script>
 </body>
 </html>

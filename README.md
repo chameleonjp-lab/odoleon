@@ -21,7 +21,7 @@ Three.js（WebGL）と Web Audio API で構築した、モバイルファース�
 ├── scripts/
 │   ├── game.js                       # 操作、採点、音の再生、3D描画、演出の処理
 │   ├── songs.js                      # 収録曲、プレイ用譜面、追加楽曲の譜面生成
-│   └── combo-effects.js              # ゲーム内に表示する80演出の名前
+│   └── combo-effects.js              # 保存済みの旧版ページが読み込む互換用データ
 ├── assets/
 │   └── orekameleon.mp3               # メイン曲『オレカメレオン』圧縮済MP3（96kbps, 約1.7MB）
 ├── data/
@@ -31,7 +31,7 @@ Three.js（WebGL）と Web Audio API で構築した、モバイルファース�
 └── README.md
 ```
 
-『オレカメレオン』の譜面を変えるときは、`data/orekameleon_chart.json` と `scripts/songs.js` の `OREKAMELEON_CHART_240` を合わせて更新します。演出の仕様は `docs/`、画面に出る演出名は `scripts/combo-effects.js`、演出の動きは `scripts/game.js` で確認できます。
+『オレカメレオン』の譜面を変えるときは、`data/orekameleon_chart.json` と `scripts/songs.js` の `OREKAMELEON_CHART_240` を合わせて更新します。演出の仕様は `docs/`、演出の動きは `scripts/game.js` で確認できます。
 
 手元で確認するときはリポジトリ直下で `python3 -m http.server 8000` を実行し、ブラウザで `http://localhost:8000/` を開きます。GitHub Pagesにもこの構成のまま配置できます。
 
