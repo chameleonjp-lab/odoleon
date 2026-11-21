@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>カメレオン・ダンス・リズム | Chameleon Dance Rhythm 3D</title>
+  <meta name="description" content="フル3Dのぐるぐる目カメレオンが音楽に合わせて最大66匹で踊るリズムゲーム！『オレカメレオン』全240ノーツ収録。" />
+  <meta property="og:title" content="カメレオン・ダンス・リズム 3D" />
+  <meta property="og:description" content="6種類のダンスボタン＆80コンボ連動演出！『オレカメレオン』全240ノーツをiPhone・PCでプレイしよう。" />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23181036'/><circle cx='32' cy='32' r='22' fill='%235d9d38'/><circle cx='24' cy='26' r='6' fill='%23fde047'/><circle cx='40' cy='26' r='6' fill='%23fde047'/><circle cx='24' cy='26' r='2.5' fill='%230b071c'/><circle cx='40' cy='26' r='2.5' fill='%230b071c'/></svg>" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="stylesheet" href="./styles/game.css" />
+</head>
+<body>
+  <div id="app">
+    <div id="stage-shell">
+      <canvas id="three-canvas"></canvas>
+      <canvas id="fx-canvas"></canvas>
+
+      <!-- Top HUD -->
+      <div id="hud">
+        <div class="hud-pill hud-left">
+          <div>
+            <div class="hud-label">TIME</div>
+            <div class="hud-value" id="time-value">0:00 / 2:25</div>
+          </div>
+          <div>
+            <div class="hud-label">NOTES</div>
+            <div class="hud-value" id="notes-value">0 / 240</div>
+          </div>
+        </div>
+
+        <div class="hud-pill" id="score-box">
+          <div class="hud-label">SCORE</div>
+          <div id="score-value">0</div>
+          <div id="combo-badge">READY</div>
+        </div>
+
+        <div class="hud-right">
+          <button class="icon-btn" id="mute-btn" type="button" aria-label="サウンド切替">
+            <span id="mute-icon">🔊</span><span id="mute-text">音ON</span>
+          </button>
+          <button class="icon-btn" id="restart-btn" type="button" aria-label="やり直す">
+            ↻ リトライ
+          </button>
+          <button class="icon-btn" id="effects-btn" type="button" aria-label="80演出リスト">
+            ✨ 80演出
+          </button>
+        </div>
+      </div>
+
+      <div id="progress-wrap">
+        <div id="progress-track">
+          <div id="progress-fill"></div>
+        </div>
+      </div>
+
+      <div id="stage-tier-pill">STAGE LV.1 — ネオン・デビュー</div>
+
+      <div id="callout-banner">いくよっ！</div>
+      <div id="unlock-toast">✨ 演出解放 #1</div>
+
+      <!-- 80 Combo Effects List Modal -->
+      <div id="effects-modal" class="hidden" role="dialog" aria-label="コンボ連動80演出リスト">
+        <div class="ef-head">
+          <h2 id="ef-modal-title">✨ コンボ連動 80演出リスト (0 / 80 解放)</h2>
+          <button class="icon-btn" id="close-effects-btn" type="button">✕ 閉じる</button>
+        </div>
+        <div id="ef-list"></div>
+      </div>
+
+      <!-- 6 Dance Buttons -->
+      <div id="controls-bar" role="group" aria-label="ダンスボタン">
+        <button class="dance-btn" data-move="1" type="button" style="--btn-color:#22c55e;--btn-dark:#14532d;--btn-glow:rgba(34,197,94,0.85);">
+          <div class="dance-btn-orb">
+            <svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 7.1-1.01L12 2z"/></svg>
+            <span class="dance-btn-key">1</span>
+          </div>
+          <span class="dance-btn-label">1:ポーズ</span>
+        </button>
+
+        <button class="dance-btn" data-move="2" type="button" style="--btn-color:#0ea5e9;--btn-dark:#0c4a6e;--btn-glow:rgba(14,165,233,0.85);">
+          <div class="dance-btn-orb">
+            <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0020 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 004 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+            <span class="dance-btn-key">2</span>
+          </div>
+          <span class="dance-btn-label">2:スピン</span>
+        </button>
+
+        <button class="dance-btn" data-move="3" type="button" style="--btn-color:#f97316;--btn-dark:#7c2d12;--btn-glow:rgba(249,115,22,0.85);">
+          <div class="dance-btn-orb">
+            <svg viewBox="0 0 24 24"><path d="M13 3h-2v6H5v2h6v6h2v-6h6V9h-6V3z"/></svg>
+            <span class="dance-btn-key">3</span>
+          </div>
+          <span class="dance-btn-label">3:ステップ</span>
+        </button>
+
+        <button class="dance-btn" data-move="4" type="button" style="--btn-color:#a855f7;--btn-dark:#4c1d95;--btn-glow:rgba(168,85,247,0.85);">
+          <div class="dance-btn-orb">
+            <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            <span class="dance-btn-key">4</span>
+          </div>
+          <span class="dance-btn-label">4:ウェーブ</span>
+        </button>
+
+        <button class="dance-btn" data-move="5" type="button" style="--btn-color:#eab308;--btn-dark:#713f12;--btn-glow:rgba(234,179,8,0.85);">
+          <div class="dance-btn-orb">
+            <svg viewBox="0 0 24 24"><path d="M12 4l-7 8h4.5v8h5v-8H19l-7-8z"/></svg>
+            <span class="dance-btn-key">5</span>
+          </div>
+          <span class="dance-btn-label">5:ジャンプ</span>
+        </button>
+
+        <button class="dance-btn" data-move="6" type="button" style="--btn-color:#ef4444;--btn-dark:#7f1d1d;--btn-glow:rgba(239,68,68,0.85);">
+          <div class="dance-btn-orb">
+            <svg viewBox="0 0 24 24"><path d="M12 2l2.2 5.3L20 6l-2.6 5.2L22 15l-5.7 1.1L16 22l-4-4-4 4-.3-5.9L2 15l4.6-3.8L4 6l5.8 1.3L12 2z"/></svg>
+            <span class="dance-btn-key">6</span>
+          </div>
+          <span class="dance-btn-label">6:フィニッシュ</span>
+        </button>
+      </div>
+
+      <!-- Title Overlay -->
+      <div class="overlay" id="title-overlay">
+        <div class="card">
+          <div class="title-tag">FULL 3D ARCADE RHYTHM</div>
+          <h1>カメレオン・ダンス・リズム</h1>
+
+          <!-- Selected Song Bar + Song Selection Button -->
+          <div class="selected-song-bar">
+            <div class="song-meta">
+              <div class="song-meta-label">SELECTED TRACK</div>
+              <div class="song-meta-title" id="home-song-title">オレカメレオン</div>
+              <div class="song-meta-sub" id="home-song-sub">全240ノーツ • 2:25 • 🎵 内蔵音源（164.4 BPM完全同期）</div>
+            </div>
+            <button class="song-select-trigger" id="open-song-select-btn" type="button">🎵 楽曲選択</button>
+          </div>
+
+          <div class="rule-grid">
+            <div class="rule-item">
+              <div class="rk">プレイ時間</div>
+              <div class="rv" id="home-dur-val">2分25秒</div>
+            </div>
+            <div class="rule-item">
+              <div class="rk">ノーツ数</div>
+              <div class="rv" id="home-notes-val">全 240 回</div>
+            </div>
+            <div class="rule-item">
+              <div class="rk">ダンス技</div>
+              <div class="rv">6 種類</div>
+            </div>
+          </div>
+          <div class="tip-box">
+            序盤から手前に<strong>子供カメレオン（最大5匹）</strong>が登場！後列55匹＋手前ブレイク隊5匹＋全80演出がすべてボタンと連動して踊るよ。
+          </div>
+          <button class="primary-btn" id="start-btn" type="button">ダンスをスタート！</button>
+          <div class="hi-score-line" id="title-hiscore">ハイスコア: 0</div>
+        </div>
+      </div>
+
+      <!-- Song Selection Modal -->
+      <div id="song-modal" class="hidden" role="dialog" aria-label="楽曲選択">
+        <div class="ef-head">
+          <h2>🎵 楽曲選択（曲の追加もOK）</h2>
+          <button class="icon-btn" id="close-song-btn" type="button">✕ 閉じる</button>
+        </div>
+        <div id="song-list"></div>
+        <input type="file" id="song-file-input" accept="audio/*,.wav,.mp3,.m4a,.ogg" style="display:none;" />
+        <div style="margin-top:10px; padding:8px 10px; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:11px;">
+          <span style="font-weight:800; color:#cbd5e1; white-space:nowrap;">判定ズレ微調整</span>
+          <input type="range" id="offset-slider" min="-120" max="120" step="10" value="0" style="flex:1; accent-color:#22d3ee;" />
+          <span id="offset-val" style="min-width:48px; text-align:right; font-weight:900; color:#fde047;">0ms</span>
+        </div>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button class="primary-btn" id="add-custom-song-btn" type="button" style="padding:10px 14px; font-size:13px;">＋ 端末の楽曲ファイルを追加（240ノーツ自動生成）</button>
+        </div>
+      </div>
+
+      <!-- Result Overlay -->
+      <div class="overlay hidden" id="result-overlay">
+        <div class="card">
+          <div class="title-tag">STAGE CLEAR!</div>
+          <div id="result-rank">S</div>
+          <p class="sub" id="result-comment">キレッキレのカメレオン・ダンス！</p>
+          <div class="stat-row">
+            <div class="stat-card">
+              <div class="sk">FINAL SCORE</div>
+              <div class="sv" id="res-score">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="sk">MAX COMBO</div>
+              <div class="sv" id="res-combo">0</div>
+            </div>
+          </div>
+          <div class="judge-grid">
+            <div class="judge-cell">
+              <div class="jk c-perf">PERFECT</div>
+              <div class="jv" id="res-perf">0</div>
+            </div>
+            <div class="judge-cell">
+              <div class="jk c-great">GREAT</div>
+              <div class="jv" id="res-great">0</div>
+            </div>
+            <div class="judge-cell">
+              <div class="jk c-ok">OK</div>
+              <div class="jv" id="res-ok">0</div>
+            </div>
+            <div class="judge-cell">
+              <div class="jk c-miss">MISS</div>
+              <div class="jv" id="res-miss">0</div>
+            </div>
+          </div>
+          <button class="primary-btn" id="play-again-btn" type="button">もう一度踊る！</button>
+          <div class="hi-score-line" id="res-hiscore">ハイスコア: 0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./scripts/game.js"></script>
+</body>
+</html>
